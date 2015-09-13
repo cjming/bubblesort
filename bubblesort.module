@@ -3,7 +3,6 @@
 /**
  * Implements hook_menu().
  */
-
 function bubblesort_menu() {
 
   $items = array();
@@ -20,21 +19,15 @@ function bubblesort_menu() {
     'access callback' => TRUE,
     'type' => MENU_CALLBACK,
   );
-  $items['bubblesort/sort'] = array(
-    'page callback' => 'bubblesort_sort',
-    'access callback' => TRUE,
-    'type' => MENU_CALLBACK,
-  );
 
   return $items;
 }
 
+/**
+ * Build form.
+ */
 function bubblesort_form($form, &$form_state) {
 
-//  if (isset($form_state['bubblesort'])) {
-//    $form['bubblesort'] = $form_state['bubblesort'];
-//  }
-//  else {
     $form['#theme'] = array('bubblesort_theme');
 
     $form['#attached']['css'] = array(
@@ -44,12 +37,12 @@ function bubblesort_form($form, &$form_state) {
       drupal_get_path('module', 'bubblesort') . '/js/bubblesort.js',
       drupal_get_path('module', 'bubblesort') . '/js/d3.min.js',
     );
-
-    //$form['bubblesort'] = bubblesort_generate($form, $form_state);
-
+    $form['total_markup'] = array(
+      '#markup' => '<p>Enter the total number of integers to be graphed:</p>'
+    );
     $form['number_integers'] = array(
       '#type' => 'textfield',
-      '#title' => t('Number of Integers'),
+      '#title' => t('Total Number of Integers (number of bars)'),
       '#size' => 2,
       '#maxlength' => 2,
       '#element_validate' => array('element_validate_integer_positive'),
@@ -72,14 +65,8 @@ function bubblesort_form($form, &$form_state) {
       '#element_validate' => array('element_validate_integer_positive'),
     );
 
-//    $form['bar_chart'] = array(
-//      '#markup' => '<div class="chart"></div>',
-//    );
-
-    // Simple validation
     $form['#validate'][] = 'bubblesort_form_validate';
 
-    // Submit callbacks for Shuffle and Step
     $form['submit_shuffle'] = array(
       '#type' => 'submit',
       '#value' => t('Shuffle'),
@@ -96,11 +83,10 @@ function bubblesort_form($form, &$form_state) {
       '#attributes' => array('onclick' => 'return (false);')
     );
 
-    //$form['#submit'][] = 'bubblesort_form_submit';
-//  }
   return $form;
 }
 
+// Validation callback
 function bubblesort_form_validate($form, &$form_state) {
   if ($form_state['values']['number_integers'] == 0) {
     form_set_error('number_integers', 'Number of integers must be greater than 0!"');
@@ -108,33 +94,23 @@ function bubblesort_form_validate($form, &$form_state) {
   if ($form_state['values']['range_integers_1'] > $form_state['values']['range_integers_2']) {
     form_set_error('range_integers_2', '2nd integer must be greater than 1st integer!"');
   }
+  if (empty($form_state['values']['range_integers_1'])) {
+    form_set_error('range_integers_1', '1st integer should not be empty.');
+  }
+  if (empty($form_state['values']['range_integers_2'])) {
+    form_set_error('range_integers_2', '2nd integer should not be empty.');
+  }
   if ($form_state['values']['range_integers_1'] == $form_state['values']['range_integers_2']) {
     form_set_error('range_integers_1', '1st integer and 2nd integer cannot be equal!"');
   }
 }
 
-//function bubblesort_form_submit($form, &$form_state) {
-//  $form_state['rebuild'] = TRUE;
-//}
-
-function bubblesort_sort_callback($form, &$form_state) {
-//
-//  $stop = 1;
-//  return $form['bar_chart'];
-}
-
+// Submit callback
 function bubblesort_form_submit_shuffle($form, &$form_state) {
   $form_state['rebuild'] = TRUE;
 }
 
-function bubblesort_form_submit_step($form, &$form_state) {
-
-
-  //$form_state['rebuild'] = TRUE;
-}
-
-
-/*
+/**
  * Implements hook_theme
  */
 function bubblesort_theme($existing, $type, $theme, $path) {
@@ -146,12 +122,12 @@ function bubblesort_theme($existing, $type, $theme, $path) {
     ),
   );
 }
+
+/**
+ * Menu callback for returning json
+ */
 function bubblesort_json($data) {
   if (empty($data)) {
-//    $numbers = range(1, 100);
-//    shuffle($numbers);
-//    $numbers=array_slice($numbers, 0, 10);
-    //sort($numbers);
     $numbers = numbers_generate();
   }
   else {
@@ -174,28 +150,15 @@ function bubblesort_json($data) {
             break;
         }
       }
-      $stop = 1;
     }
-
-//    $numbers = range($range1, $range2);
-//    shuffle($numbers);
-//    $numbers=array_slice($numbers, 0, $total);
-    //sort($numbers);
-
     $numbers = numbers_generate($total, $range1, $range2, false);
-
-    $stop = 1;
   }
   return drupal_json_output($numbers);
 }
 
-function bubblesort_sort($data) {
-
-  $data = explode(',', $data);
-  $numbers = numbers_sort($data);
-  return drupal_json_output($numbers);
-}
-
+/**
+ * Helper function for generating numbers array
+ */
 function numbers_generate($total = 10, $range1 = 1, $range2 = 100, $sort = FALSE) {
   $numbers = range($range1, $range2);
   shuffle($numbers);
@@ -205,16 +168,3 @@ function numbers_generate($total = 10, $range1 = 1, $range2 = 100, $sort = FALSE
   }
   return $numbers;
 }
-
-function numbers_sort($values, $start = 0) {
-  if ($values[$start] > $values[$start + 1]) {
-    $temp = $values[$start];
-    $values[$start] = $values[$start + 1];
-    $values[$start + 1] = $temp;
-  }
-  return $values;
-}
-
-//function bubblesort_generate($form, &$form_state) {
-//
-//}
