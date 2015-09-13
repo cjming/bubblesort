@@ -35,8 +35,8 @@
         function bubblesort_display(data) {
 
             x = d3.scale.linear()
-                .domain([0, d3.max(data)])
-                .range([0, 420]);
+                .domain([0, 100])
+                .range([0, 500]);
 
             d3.select(".chart")
                 .selectAll("div")
@@ -65,6 +65,7 @@
             var sorted = 0;
             var unsorted = 0;
             var all = $('.chart > div');
+            j = '';
 
             all.each(function () {
                 if ($(this).hasClass("unsorted")) {
@@ -77,15 +78,6 @@
             });
 
             var total = data.length;
-
-            // If sorting is finished, exit
-            if (total == sorted) {
-                $('#edit-step-button').hide();
-                $('#edit-play-button').hide();
-                stop = true;
-                return;
-            }
-
             var indexToRemove = 0;
             var numberToRemove = 2;
 
@@ -108,8 +100,8 @@
 
             // Redraw bar chart with sorted pieces
             j = d3.scale.linear()
-                .domain([0, d3.max(data)])
-                .range([0, 420]);
+                .domain([0, 100])
+                .range([0, 500]);
 
             d3.select(".chart").selectAll(".unsorted")
                 .data(data)
@@ -131,6 +123,14 @@
             });
             for (i = indexToRemove; i < finalIndex; i++) {
                 $('.chart > div:eq('+i+')').css('background-color', 'green').addClass('sorted');
+            }
+
+            // If sorting is finished, exit
+            if (sorted == total - 1) {
+                $('#edit-step-button').hide();
+                $('#edit-play-button').hide();
+                stop = true;
+                return;
             }
         }
 
