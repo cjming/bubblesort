@@ -1,0 +1,8 @@
+name = Bubble Sort
+description = BubbleSort Simulation
+package = Custom
+core = 7.x
+
+files[] = bubblesort.module
+
+
