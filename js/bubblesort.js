@@ -2,6 +2,7 @@
   Drupal.behaviors.bubblesort = {
     attach: function (context, settings) {
 
+        // Init vars
         base_path = Drupal.settings.basePath;
         var x, i, j, interval, values = null;
         var stop = false;
@@ -77,6 +78,7 @@
 
             var total = data.length;
 
+            // If sorting is finished, exit
             if (total == sorted) {
                 $('#edit-step-button').hide();
                 $('#edit-play-button').hide();
@@ -104,6 +106,7 @@
 
             data = $.merge( newdata, data );
 
+            // Redraw bar chart with sorted pieces
             j = d3.scale.linear()
                 .domain([0, d3.max(data)])
                 .range([0, 420]);
@@ -119,6 +122,7 @@
 
             var finalIndex = indexToRemove + numberToRemove;
 
+            // Set background colors on sorted bars
             all.each(function (index) {
                 if (index == indexToRemove) {
                     $(this).css('background-color', 'green').addClass('sorted');
